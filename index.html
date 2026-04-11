@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda Acadêmica</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --surface2: #f0f1f4;
+  --surface3: #e4e6eb;
+  --border: #dde0e7;
+  --border2: #eceef2;
+  --text: #111827;
+  --text2: #4b5563;
+  --text3: #9ca3af;
+  --accent: #2563eb;
+  --accent-light: #eff6ff;
+  --accent-text: #1d4ed8;
+  --green: #16a34a; --green-bg: #f0fdf4; --green-border: #bbf7d0;
+  --yellow: #ca8a04; --yellow-bg: #fefce8; --yellow-border: #fde68a;
+  --orange: #ea580c; --orange-bg: #fff7ed; --orange-border: #fed7aa;
+  --red: #dc2626; --red-bg: #fef2f2; --red-border: #fecaca;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+body { font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; font-size:14px; line-height:1.5; }
+::-webkit-scrollbar { width:5px; height:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:8px; }
+
+/* HEADER */
+.header {
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  height:56px;
+  display:flex;
+  align-items:center;
+  padding:0 16px;
+  gap:8px;
+  position:sticky;
+  top:0;
+  z-index:200;
+  box-shadow:var(--shadow-sm);
+}
+.logo { font-size:15px; font-weight:700; color:var(--text); letter-spacing:-0.3px; display:flex; align-items:center; gap:7px; white-space:nowrap; }
+.logo-icon { color:var(--accent); display:flex; align-items:center; }
+.vdivider { width:1px; height:22px; background:var(--border); margin:0 4px; flex-shrink:0; }
+.week-nav { display:flex; align-items:center; gap:4px; }
+.week-label { font-size:13px; font-weight:500; color:var(--text2); min-width:175px; text-align:center; white-space:nowrap; }
+
+.btn {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:6px 12px; border-radius:7px; font-size:13px; font-weight:500;
+  cursor:pointer; border:1px solid var(--border); background:var(--surface);
+  color:var(--text2); transition:all 0.15s; font-family:inherit; white-space:nowrap;
+}
+.btn:hover { background:var(--surface2); color:var(--text); border-color:#c5c9d4; }
+.btn-icon { padding:6px 8px; }
+.btn-primary { background:var(--accent); color:white; border-color:var(--accent); }
+.btn-primary:hover { background:#1d4ed8; border-color:#1d4ed8; color:white; }
+.btn-ghost { border-color:transparent; background:transparent; }
+.btn-ghost:hover { background:var(--surface2); border-color:var(--border); }
+.btn-success { color:var(--green); border-color:var(--green-border); background:var(--green-bg); }
+.btn-success:hover { background:#dcfce7; }
+.btn-danger { color:var(--red); border-color:var(--red-border); background:var(--red-bg); }
+.btn-danger:hover { background:#fee2e2; }
+
+.tabs { display:flex; background:var(--surface2); border-radius:8px; padding:3px; gap:2px; }
+.tab { padding:5px 14px; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; color:var(--text3); border:none; background:none; font-family:inherit; transition:all 0.15s; }
+.tab.active { background:var(--surface); color:var(--text); box-shadow:var(--shadow-sm); }
+.tab:hover:not(.active) { color:var(--text2); }
+
+.hspacer { flex:1; }
+.show-mobile { display:none; }
+
+/* LAYOUT */
+.layout { display:flex; height:calc(100vh - 56px); }
+
+/* SIDEBAR */
+.sidebar { width:220px; min-width:220px; background:var(--surface); border-right:1px solid var(--border); overflow-y:auto; padding:16px 12px; display:flex; flex-direction:column; gap:20px; transition:transform 0.25s ease; }
+.sb-title { font-size:10px; font-weight:600; letter-spacing:0.8px; text-transform:uppercase; color:var(--text3); margin-bottom:8px; }
+.disc-item { display:flex; align-items:center; gap:8px; padding:7px 8px; border-radius:7px; cursor:pointer; transition:background 0.12s; }
+.disc-item:hover { background:var(--surface2); }
+.disc-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+.disc-name { font-size:12px; font-weight:500; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.disc-score { font-size:11px; font-weight:600; padding:2px 7px; border-radius:4px; white-space:nowrap; }
+.score-ok   { background:var(--green-bg);  color:var(--green);  }
+.score-warn { background:var(--yellow-bg); color:var(--yellow); }
+.score-neu  { background:var(--surface2);  color:var(--text3);  }
+.leg-row { display:flex; align-items:center; gap:7px; font-size:11px; color:var(--text2); padding:3px 0; }
+.leg-pip { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+
+/* MAIN */
+.content { flex:1; overflow:hidden; display:flex; flex-direction:column; }
+
+/* CALENDAR */
+.cal-wrap { display:none; flex-direction:column; height:100%; }
+.cal-wrap.active { display:flex; }
+.cal-scroll { flex:1; overflow:auto; }
+.cal-grid { display:grid; grid-template-columns:52px repeat(7,1fr); min-width:620px; }
+
+.cal-corner { background:var(--surface); border-bottom:2px solid var(--border); border-right:1px solid var(--border2); position:sticky; top:0; left:0; z-index:15; }
+.cal-dh { background:var(--surface); border-bottom:2px solid var(--border); border-right:1px solid var(--border2); padding:8px 4px; text-align:center; position:sticky; top:0; z-index:10; }
+.cal-dh .dabbr { font-size:10px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; display:block; }
+.cal-dh .dnum  { font-size:20px; font-weight:700; color:var(--text); line-height:1.1; display:block; }
+.cal-dh.is-today { border-bottom-color:var(--accent); }
+.cal-dh.is-today .dnum  { color:var(--accent); }
+.cal-dh.is-today .dabbr { color:var(--accent); }
+
+.tcell { background:var(--surface); border-right:1px solid var(--border); border-bottom:1px solid var(--border2); font-size:10px; color:var(--text3); text-align:right; padding:3px 6px 0 0; height:44px; display:flex; align-items:flex-start; justify-content:flex-end; position:sticky; left:0; z-index:5; font-weight:500; }
+.dcell { border-right:1px solid var(--border2); border-bottom:1px solid var(--border2); height:44px; position:relative; cursor:pointer; background:var(--surface); transition:background 0.1s; }
+.dcell:hover { background:var(--accent-light); }
+.dcell.is-today { background:#f8faff; }
+.dcell.is-today:hover { background:#eef3fe; }
+.dcell.half { border-bottom:1px dashed var(--border2); }
+
+.cell-plus { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; color:var(--accent); font-size:16px; font-weight:300; pointer-events:none; transition:opacity 0.1s; }
+.dcell:hover .cell-plus { opacity:0.4; }
+
+.ev-block { position:absolute; left:2px; right:2px; border-radius:5px; padding:2px 5px; font-size:10px; font-weight:500; line-height:1.3; cursor:pointer; overflow:hidden; z-index:4; border-left:3px solid; transition:box-shadow 0.12s,transform 0.12s; }
+.ev-block:hover { box-shadow:var(--shadow); transform:scale(1.01); z-index:8; }
+.ev-title { font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:10px; }
+.ev-meta  { font-size:9px; opacity:0.72; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+.s-pending   { background:#eff6ff; border-left-color:#2563eb; color:#1e40af; }
+.s-done      { background:var(--green-bg);  border-left-color:var(--green);  color:#15803d; }
+.s-upcoming  { background:var(--yellow-bg); border-left-color:var(--yellow); color:#92400e; }
+.s-late      { background:var(--orange-bg); border-left-color:var(--orange); color:#9a3412; }
+.s-cancelled { background:var(--red-bg);    border-left-color:var(--red);    color:#991b1b; opacity:.65; }
+
+.now-line { position:absolute; left:0; right:0; height:2px; background:#ef4444; z-index:7; pointer-events:none; }
+.now-line::before { content:''; position:absolute; left:-3px; top:-3px; width:8px; height:8px; background:#ef4444; border-radius:50%; }
+
+/* SUMMARY */
+.sum-wrap { display:none; padding:20px; overflow-y:auto; height:100%; }
+.sum-wrap.active { display:block; }
+.sum-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; }
+
+.sum-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; box-shadow:var(--shadow-sm); }
+.sum-top { padding:14px 16px 12px; border-bottom:1px solid var(--border2); }
+.sum-name { font-size:14px; font-weight:600; margin-bottom:10px; display:flex; align-items:center; gap:7px; }
+.sum-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.sum-score-row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; }
+.sum-score-big { font-size:22px; font-weight:700; }
+.pbar { height:5px; background:var(--surface3); border-radius:3px; overflow:hidden; }
+.pbar-fill { height:100%; border-radius:3px; transition:width 0.4s ease; }
+.pbar-info { display:flex; justify-content:space-between; margin-top:4px; font-size:10px; color:var(--text3); }
+
+.eval-row { display:flex; align-items:center; gap:10px; padding:9px 16px; border-bottom:1px solid var(--border2); font-size:12px; }
+.eval-row:last-child { border-bottom:none; }
+.eval-icon { flex-shrink:0; display:flex; align-items:center; }
+.eval-info { flex:1; min-width:0; }
+.eval-name { font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.eval-date { font-size:10px; color:var(--text3); }
+.eval-badge { font-size:11px; font-weight:600; padding:2px 8px; border-radius:4px; white-space:nowrap; flex-shrink:0; }
+
+/* DETAIL PANEL */
+.detail { position:fixed; right:0; top:56px; bottom:0; width:300px; background:var(--surface); border-left:1px solid var(--border); box-shadow:var(--shadow-lg); z-index:150; overflow-y:auto; transform:translateX(100%); transition:transform 0.22s ease; padding:16px; }
+.detail.open { transform:translateX(0); }
+.det-info-grid { display:grid; gap:1px; background:var(--border2); border:1px solid var(--border2); border-radius:8px; overflow:hidden; margin-bottom:12px; }
+.det-row { display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:var(--surface); font-size:12px; gap:12px; }
+.det-label { color:var(--text3); font-weight:500; flex-shrink:0; }
+.det-val { text-align:right; font-weight:500; word-break:break-word; max-width:170px; }
+.score-box { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:14px; margin-bottom:12px; text-align:center; }
+
+/* OVERLAYS / MODALS */
+.overlay { display:none; position:fixed; inset:0; background:rgba(15,23,42,.35); backdrop-filter:blur(3px); z-index:500; align-items:center; justify-content:center; padding:16px; }
+.overlay.open { display:flex; }
+.modal { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:24px; width:100%; max-width:480px; max-height:90vh; overflow-y:auto; box-shadow:var(--shadow-lg); animation:mIn .2s ease; }
+.modal-sm { max-width:360px; }
+@keyframes mIn { from{transform:translateY(12px);opacity:0} to{transform:translateY(0);opacity:1} }
+.modal-title { font-size:16px; font-weight:600; margin-bottom:18px; }
+.field { margin-bottom:13px; }
+.flabel { display:block; font-size:11px; font-weight:600; color:var(--text3); letter-spacing:.4px; text-transform:uppercase; margin-bottom:5px; }
+.finput, .fselect, .ftextarea { width:100%; border:1px solid var(--border); border-radius:7px; padding:8px 11px; font-size:13px; font-family:inherit; color:var(--text); background:var(--surface); outline:none; transition:border-color .15s,box-shadow .15s; }
+.finput:focus,.fselect:focus,.ftextarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(37,99,235,.1); }
+.ftextarea { resize:vertical; min-height:64px; }
+.frow  { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.mfoot { display:flex; gap:8px; margin-top:18px; }
+.mfoot .btn { flex:1; justify-content:center; }
+
+/* BADGE */
+.badge { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600; padding:3px 9px; border-radius:5px; }
+.b-pending  { background:var(--accent-light); color:var(--accent-text); }
+.b-done     { background:var(--green-bg);  color:var(--green);  }
+.b-upcoming { background:var(--yellow-bg); color:var(--yellow); }
+.b-late     { background:var(--orange-bg); color:var(--orange); }
+.b-cancelled{ background:var(--red-bg);    color:var(--red);    }
+
+/* TOAST */
+.toast { position:fixed; bottom:20px; right:20px; padding:10px 16px; border-radius:8px; font-size:13px; font-weight:500; z-index:9999; animation:mIn .2s ease; box-shadow:var(--shadow-lg); border:1px solid; }
+.toast.success { background:var(--green-bg);  color:var(--green);  border-color:var(--green-border); }
+.toast.error   { background:var(--red-bg);    color:var(--red);    border-color:var(--red-border);   }
+
+/* SIDEBAR OVERLAY (mobile) */
+.sb-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.2); z-index:140; }
+
+/* MOBILE TABS */
+.tabs-mobile { display:none; border-bottom:1px solid var(--border); background:var(--surface); padding:0 16px; }
+.tabs-mobile .tab { border-radius:0; border-bottom:2px solid transparent; padding:10px 16px; }
+.tabs-mobile .tab.active { background:transparent; box-shadow:none; border-bottom-color:var(--accent); color:var(--accent); }
+
+/* RESPONSIVE */
+@media (max-width:900px) {
+  .sidebar { position:fixed; left:0; top:56px; bottom:0; z-index:150; transform:translateX(-100%); box-shadow:var(--shadow-lg); }
+  .sidebar.open { transform:translateX(0); }
+  .sb-overlay.vis { display:block; }
+  .show-mobile { display:flex !important; }
+  .hide-mobile { display:none !important; }
+  .week-label { min-width:130px; font-size:12px; }
+  .logo-text { display:none; }
+}
+@media (max-width:600px) {
+  .header { padding:0 10px; gap:5px; }
+  .modal { padding:18px; }
+  .frow { grid-template-columns:1fr; }
+  .detail { width:100%; }
+  .tabs-mobile { display:flex; }
+  .tabs-mobile .tab { font-size:13px; }
+}
+
+.empty-msg { font-size:12px; color:var(--text3); text-align:center; padding:12px 4px; line-height:1.7; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <!-- Mobile: hamburger -->
+  <button class="btn btn-ghost btn-icon show-mobile" style="display:none" onclick="toggleSidebar()">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect y="2.5" width="16" height="1.5" rx=".75" fill="currentColor"/><rect y="7.25" width="16" height="1.5" rx=".75" fill="currentColor"/><rect y="12" width="16" height="1.5" rx=".75" fill="currentColor"/></svg>
+  </button>
+
+  <div class="logo">
+    <span class="logo-icon">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2.5" y="3" width="15" height="14" rx="2" stroke="#2563eb" stroke-width="1.5"/><path d="M6.5 3V1.5M13.5 3V1.5" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round"/><path d="M2.5 7h15" stroke="#2563eb" stroke-width="1.3"/><rect x="5.5" y="10" width="2.5" height="2.5" rx=".5" fill="#2563eb" opacity=".55"/><rect x="10" y="10" width="2.5" height="2.5" rx=".5" fill="#2563eb" opacity=".35"/><rect x="5.5" y="13.5" width="2.5" height="1" rx=".5" fill="#2563eb" opacity=".2"/><rect x="10" y="13.5" width="2.5" height="1" rx=".5" fill="#2563eb" opacity=".2"/></svg>
+    </span>
+    <span class="logo-text">Agenda Acadêmica</span>
+  </div>
+
+  <div class="vdivider"></div>
+
+  <div class="week-nav">
+    <button class="btn btn-ghost btn-icon" onclick="changeWeek(-1)">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <span class="week-label" id="weekLabel">—</span>
+    <button class="btn btn-ghost btn-icon" onclick="changeWeek(1)">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 11l4-4-4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="btn btn-ghost" onclick="goToToday()" style="color:var(--accent);font-size:12px;padding:5px 10px">Hoje</button>
+  </div>
+
+  <div class="hspacer"></div>
+
+  <!-- Desktop actions -->
+  <div class="hide-mobile" style="display:flex;align-items:center;gap:6px">
+    <div class="tabs" id="desktopTabs">
+      <button class="tab active" data-view="calendar" onclick="switchView('calendar',this)">Calendário</button>
+      <button class="tab" data-view="summary" onclick="switchView('summary',this)">Resumo</button>
+    </div>
+    <div class="vdivider"></div>
+    <button class="btn btn-primary" onclick="openAddModal()">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="white" stroke-width="1.7" stroke-linecap="round"/></svg>
+      Novo compromisso
+    </button>
+    <button class="btn btn-ghost btn-icon" onclick="exportData()" title="Exportar JSON">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4.5 7.5L8 11l3.5-3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12.5v1A.5.5 0 002.5 14h11a.5.5 0 00.5-.5v-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </button>
+    <label class="btn btn-ghost btn-icon" style="cursor:pointer" title="Importar JSON">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 10V1M4.5 4.5L8 1l3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12.5v1A.5.5 0 002.5 14h11a.5.5 0 00.5-.5v-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <input type="file" accept=".json" style="display:none" onchange="importData(event)">
+    </label>
+  </div>
+
+  <!-- Mobile: add btn -->
+  <button class="btn btn-primary btn-icon show-mobile" style="display:none" onclick="openAddModal()">
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+  </button>
+</header>
+
+<!-- Mobile tabs -->
+<div class="tabs-mobile" id="mobileTabs">
+  <button class="tab active" data-view="calendar" onclick="switchView('calendar',this)">Calendário</button>
+  <button class="tab" data-view="summary" onclick="switchView('summary',this)">Resumo</button>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+  <div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div>
+      <div class="sb-title">Disciplinas</div>
+      <button class="btn btn-ghost" style="width:100%;justify-content:center;font-size:12px;margin-bottom:8px;border:1px dashed var(--border);color:var(--accent)" onclick="openDiscModal()">
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1v9M1 5.5h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Nova disciplina
+      </button>
+      <div id="discList"></div>
+    </div>
+
+    <div>
+      <div class="sb-title">Status</div>
+      <div class="leg-row"><div class="leg-pip" style="background:#2563eb"></div>Pendente</div>
+      <div class="leg-row"><div class="leg-pip" style="background:#ca8a04"></div>Em breve (≤ 7 dias)</div>
+      <div class="leg-row"><div class="leg-pip" style="background:#16a34a"></div>Realizado</div>
+      <div class="leg-row"><div class="leg-pip" style="background:#ea580c"></div>Atrasado</div>
+      <div class="leg-row"><div class="leg-pip" style="background:#dc2626"></div>Cancelado</div>
+    </div>
+
+    <div>
+      <div class="sb-title">Tipos de compromisso</div>
+      <div class="leg-row" style="color:#dc2626">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="10" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M6 6h4M6 9h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <span style="color:var(--text2)">Prova</span>
+      </div>
+      <div class="leg-row" style="color:#ea580c">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 13V5.5a5 5 0 0110 0V13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M1.5 13h13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span style="color:var(--text2)">Seminário</span>
+      </div>
+      <div class="leg-row" style="color:#ca8a04">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 4h8M4 8h6M4 12h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span style="color:var(--text2)">Lista / Tarefa</span>
+      </div>
+      <div class="leg-row" style="color:#16a34a">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M3 14c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span style="color:var(--text2)">Extensão / Projeto</span>
+      </div>
+      <div class="leg-row" style="color:#0284c7">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M5 6C5 4.34 6.34 3 8 3s3 1.34 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="6" r="1" fill="currentColor"/></svg>
+        <span style="color:var(--text2)">Reunião Estágio</span>
+      </div>
+      <div class="leg-row" style="color:#7c3aed">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="3" y="3" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M6 8l1.5 1.5L10.5 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span style="color:var(--text2)">Task Estágio</span>
+      </div>
+      <div class="leg-row" style="color:#0891b2">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="2" y="3.5" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M6 14.5h4M8 11.5V14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M5 7h6M5 9.5h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <span style="color:var(--text2)">Aula</span>
+      </div>
+    </div>
+
+    <!-- Mobile extra actions -->
+    <div class="show-mobile" style="display:none;flex-direction:column;gap:6px">
+      <div class="sb-title">Ações</div>
+      <button class="btn" onclick="exportData();closeSidebar()">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4.5 7.5L8 11l3.5-3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12.5v1A.5.5 0 002.5 14h11a.5.5 0 00.5-.5v-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Exportar dados
+      </button>
+      <label class="btn" style="cursor:pointer">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 10V1M4.5 4.5L8 1l3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12.5v1A.5.5 0 002.5 14h11a.5.5 0 00.5-.5v-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Importar dados
+        <input type="file" accept=".json" style="display:none" onchange="importData(event)">
+      </label>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- Calendar -->
+    <div class="cal-wrap active" id="calView">
+      <div class="cal-scroll" id="calScroll">
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="sum-wrap" id="sumView">
+      <div style="margin-bottom:18px">
+        <div style="font-size:18px;font-weight:700;margin-bottom:2px">Resumo por Disciplina</div>
+        <div style="font-size:12px;color:var(--text3)">Pontuação acumulada e status das avaliações</div>
+      </div>
+      <div class="sum-grid" id="sumGrid"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Detail panel -->
+<div class="detail" id="detPanel">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <span style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Detalhes</span>
+    <button class="btn btn-ghost btn-icon" onclick="closeDetail()">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div id="detContent"></div>
+</div>
+
+<!-- Event Modal -->
+<div class="overlay" id="evModal">
+  <div class="modal">
+    <div class="modal-title" id="evTitle_h">Novo Compromisso</div>
+    <div class="field">
+      <label class="flabel">Título *</label>
+      <input class="finput" id="evTitle" placeholder="Nome do compromisso">
+    </div>
+    <div class="frow">
+      <div class="field">
+        <label class="flabel">Tipo *</label>
+        <select class="fselect" id="evType" onchange="updateTypeUI()">
+          <option value="aula">Aula</option>
+          <option value="prova">Prova</option>
+          <option value="seminario">Seminário</option>
+          <option value="lista">Lista / Tarefa</option>
+          <option value="extensao">Extensão / Projeto</option>
+          <option value="reuniao">Reunião Estágio</option>
+          <option value="task">Task Estágio</option>
+          <option value="outro">Outro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="flabel">Disciplina</label>
+        <select class="fselect" id="evDisc"><option value="">— Nenhuma —</option></select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="field"><label class="flabel">Data *</label><input class="finput" id="evDate" type="date"></div>
+      <div class="field">
+        <label class="flabel">Status</label>
+        <select class="fselect" id="evStatus">
+          <option value="pending">Pendente</option>
+          <option value="done">Realizado</option>
+          <option value="cancelled">Cancelado</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="field"><label class="flabel">Início</label><input class="finput" id="evStart" type="time" value="08:00"></div>
+      <div class="field"><label class="flabel">Fim</label><input class="finput" id="evEnd" type="time" value="09:00"></div>
+    </div>
+    <div id="gradeSection" style="display:none">
+      <div class="frow">
+        <div class="field"><label class="flabel">Pontos possíveis</label><input class="finput" id="evMax" type="number" min="0" step="0.1" placeholder="ex: 10.0"></div>
+        <div class="field"><label class="flabel">Pontos obtidos</label><input class="finput" id="evScore" type="number" min="0" step="0.1" placeholder="após realização"></div>
+      </div>
+    </div>
+    <div class="field"><label class="flabel">Local / Link</label><input class="finput" id="evLoc" placeholder="Sala, Meet, Teams..."></div>
+    <div class="field"><label class="flabel">Notas</label><textarea class="ftextarea" id="evDesc" placeholder="Observações, conteúdo, links..."></textarea></div>
+    <div class="mfoot">
+      <button class="btn btn-primary" onclick="saveEvent()">Salvar</button>
+      <button class="btn" onclick="closeOverlay('evModal')">Cancelar</button>
+      <button class="btn btn-danger" id="evDelBtn" style="display:none;flex:0;padding:6px 10px" onclick="deleteEvent()">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V2.5A.5.5 0 015.5 2h3a.5.5 0 01.5.5V4M5.5 6.5v4M8.5 6.5v4M3 4l.6 7.5a.5.5 0 00.5.5h5.8a.5.5 0 00.5-.5L11 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Discipline Modal -->
+<div class="overlay" id="discModal">
+  <div class="modal modal-sm">
+    <div class="modal-title">Disciplina / Área</div>
+    <div class="field"><label class="flabel">Nome *</label><input class="finput" id="discName" placeholder="ex: Cálculo III, Estágio..."></div>
+    <div class="frow">
+      <div class="field"><label class="flabel">Cor</label><input type="color" class="finput" id="discColor" value="#2563eb" style="height:38px;padding:3px;cursor:pointer"></div>
+      <div class="field"><label class="flabel">Nota mínima (%)</label><input class="finput" id="discMin" type="number" min="0" max="100" value="60"></div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-primary" onclick="saveDiscipline()">Salvar</button>
+      <button class="btn" onclick="closeOverlay('discModal')">Cancelar</button>
+      <button class="btn btn-danger" id="discDelBtn" style="display:none;flex:0;padding:6px 10px" onclick="deleteDiscipline()">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V2.5A.5.5 0 015.5 2h3a.5.5 0 01.5.5V4M5.5 6.5v4M8.5 6.5v4M3 4l.6 7.5a.5.5 0 00.5.5h5.8a.5.5 0 00.5-.5L11 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== STATE =====
+let S = { events:[], disciplines:[] };
+let weekStart = null;
+let editEvId = null, editDiscId = null;
+let currentView = 'calendar';
+
+const DAYS_ABR = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const EVAL_TYPES = ['prova','seminario','lista','task'];
+const TYPE_COLORS = { prova:'#dc2626', seminario:'#ea580c', lista:'#ca8a04', extensao:'#16a34a', reuniao:'#0284c7', task:'#7c3aed', aula:'#0891b2', outro:'#6b7280' };
+const TYPE_LABELS = { prova:'Prova', seminario:'Seminário', lista:'Lista/Tarefa', extensao:'Extensão', reuniao:'Reunião Est.', task:'Task Est.', aula:'Aula', outro:'Outro' };
+
+const TYPE_ICONS = {
+  prova:    `<svg width="11" height="11" viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="10" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M6 6h4M6 9h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
+  seminario:`<svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 13V5.5a5 5 0 0110 0V13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M1.5 13h13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+  lista:    `<svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M4 4h8M4 8h6M4 12h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+  extensao: `<svg width="11" height="11" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M3 14c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+  reuniao:  `<svg width="11" height="11" viewBox="0 0 16 16" fill="none"><circle cx="5.5" cy="5" r="2" stroke="currentColor" stroke-width="1.4"/><circle cx="10.5" cy="5" r="2" stroke="currentColor" stroke-width="1.4"/><path d="M1.5 13c0-2.2 1.8-4 4-4s4 1.8 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M10.5 9c1.7.5 3 2 3 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+  task:     `<svg width="11" height="11" viewBox="0 0 16 16" fill="none"><rect x="3" y="3" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M6 8l1.5 1.5L10.5 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  aula:     `<svg width="11" height="11" viewBox="0 0 16 16" fill="none"><rect x="2" y="3.5" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M6 14.5h4M8 11.5V14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M5 7h6M5 9h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
+  outro:    `<svg width="11" height="11" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v3.5M8 11v.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+};
+
+// ===== STORAGE =====
+function save() { localStorage.setItem('agAcad_v2', JSON.stringify(S)); }
+function load() {
+  try { const r=localStorage.getItem('agAcad_v2'); if(r) S=JSON.parse(r); } catch(e){}
+  if(!S.events) S.events=[]; if(!S.disciplines) S.disciplines=[];
+}
+
+// ===== DATE =====
+function getWS(d) { const x=new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()-x.getDay()); return x; }
+function ds(d) { return d.toISOString().split('T')[0]; }
+function pd(s) { const [y,m,day]=s.split('-').map(Number); return new Date(y,m-1,day); }
+
+// ===== STATUS =====
+function getStatus(ev) {
+  if(ev.status==='done') return 'done';
+  if(ev.status==='cancelled') return 'cancelled';
+  const diff=(pd(ev.date)-new Date())/864e5;
+  if(diff<-0.5) return 'late';
+  if(diff<=7) return 'upcoming';
+  return 'pending';
+}
+const SL = {pending:'Pendente',done:'Realizado',upcoming:'Em breve',late:'Atrasado',cancelled:'Cancelado'};
+const SC = {pending:'s-pending',done:'s-done',upcoming:'s-upcoming',late:'s-late',cancelled:'s-cancelled'};
+const BC = {pending:'b-pending',done:'b-done',upcoming:'b-upcoming',late:'b-late',cancelled:'b-cancelled'};
+
+// ===== RENDER CALENDAR =====
+function renderCalendar() {
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+  const todayStr = ds(new Date());
+  const days = [];
+  for(let i=0;i<7;i++){ const d=new Date(weekStart); d.setDate(weekStart.getDate()+i); days.push(d); }
+
+  // Week label
+  document.getElementById('weekLabel').textContent =
+    `${weekStart.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})} – ${days[6].toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'2-digit'})}`;
+
+  // Header
+  const corner = el('div','cal-corner'); grid.appendChild(corner);
+  days.forEach(d => {
+    const isToday = ds(d)===todayStr;
+    const h = el('div','cal-dh'+(isToday?' is-today':''));
+    h.innerHTML=`<span class="dabbr">${DAYS_ABR[d.getDay()]}</span><span class="dnum">${d.getDate()}</span>`;
+    grid.appendChild(h);
+  });
+
+  // Rows
+  const now = new Date();
+  for(let h=0;h<24;h++) {
+    for(let half=0;half<2;half++) {
+      const tc = el('div','tcell');
+      if(!half) tc.textContent=`${String(h).padStart(2,'0')}:00`;
+      grid.appendChild(tc);
+      days.forEach((d,di) => {
+        const isToday = ds(d)===todayStr;
+        const c = el('div','dcell'+(half?' half':'')+(isToday?' is-today':''));
+        c.dataset.date=ds(d);
+        if(isToday && !half && now.getHours()===h) {
+          const nl=el('div','now-line'); nl.style.top=`${(now.getMinutes()/60)*100}%`; c.appendChild(nl);
+        }
+        const p=el('div','cell-plus'); p.textContent='+'; c.appendChild(p);
+        c.addEventListener('click',e=>{
+          if(e.target.closest('.ev-block')) return;
+          openAddModal(ds(d),`${String(h).padStart(2,'0')}:${half?'30':'00'}`);
+        });
+        grid.appendChild(c);
+      });
+    }
+  }
+
+  // Events
+  const kids = Array.from(grid.children);
+  const we = new Date(weekStart); we.setDate(we.getDate()+7);
+  S.events.filter(ev => { const d=pd(ev.date); return d>=weekStart&&d<we; }).forEach(ev => {
+    const di=days.findIndex(d=>ds(d)===ev.date);
+    if(di<0) return;
+    const [sh,sm]=(ev.startTime||'08:00').split(':').map(Number);
+    const [eh,em]=(ev.endTime||'09:00').split(':').map(Number);
+    const dur=Math.max(30,(eh*60+em)-(sh*60+sm));
+    const ri=sh*2+(sm>=30?1:0);
+    const ci=8+ri*8+(di+1);
+    if(ci>=kids.length) return;
+    const cell=kids[ci];
+    const status=getStatus(ev);
+    const tc=TYPE_COLORS[ev.type]||'#6b7280';
+    const disc=S.disciplines.find(d=>d.id===ev.disciplineId);
+    const scoreStr=EVAL_TYPES.includes(ev.type)&&ev.maxScore?` · ${ev.score!==undefined&&ev.score!==''?ev.score:'?'}/${ev.maxScore}`:'';
+    const b=el('div',`ev-block ${SC[status]}`);
+    b.style.cssText=`top:${(sm%30/30)*100}%;height:${(dur/30)*44}px;border-left-color:${tc}`;
+    b.innerHTML=`<div class="ev-title">${ev.title}${scoreStr}</div>${disc?`<div class="ev-meta" style="color:${disc.color}">${disc.name}</div>`:''}${ev.startTime?`<div class="ev-meta">${ev.startTime}–${ev.endTime||''}</div>`:''}`;
+    b.addEventListener('click',e=>{e.stopPropagation();openDetail(ev);});
+    b.addEventListener('dblclick',e=>{e.stopPropagation();openEditModal(ev);});
+    cell.appendChild(b);
+  });
+}
+
+function el(tag,cls){ const e=document.createElement(tag); if(cls) e.className=cls; return e; }
+
+// ===== SIDEBAR =====
+function renderSidebar() {
+  const list=document.getElementById('discList');
+  if(!S.disciplines.length){ list.innerHTML='<div class="empty-msg">Nenhuma disciplina.<br>Adicione acima.</div>'; return; }
+  list.innerHTML='';
+  S.disciplines.forEach(disc => {
+    const evs=S.events.filter(e=>e.disciplineId===disc.id&&EVAL_TYPES.includes(e.type));
+    const totalMax=evs.reduce((a,e)=>a+(e.maxScore||0),0);
+    const totalGot=evs.filter(e=>e.score!==undefined&&e.score!=='').reduce((a,e)=>a+(parseFloat(e.score)||0),0);
+    const pct=totalMax>0?Math.round((totalGot/totalMax)*100):null;
+    const min=disc.minScore||60;
+    const cls=pct===null?'score-neu':pct>=min?'score-ok':'score-warn';
+    const row=el('div','disc-item');
+    row.innerHTML=`<div class="disc-dot" style="background:${disc.color}"></div><div class="disc-name" title="${disc.name}">${disc.name}</div><div class="disc-score ${cls}">${pct!==null?pct+'%':'—'}</div>`;
+    row.onclick=()=>openDiscModal(disc);
+    list.appendChild(row);
+  });
+}
+
+// ===== DETAIL =====
+function openDetail(ev) {
+  const status=getStatus(ev);
+  const disc=S.disciplines.find(d=>d.id===ev.disciplineId);
+  const tc=TYPE_COLORS[ev.type]||'#6b7280';
+
+  let scoreHtml='';
+  if(EVAL_TYPES.includes(ev.type)&&ev.maxScore) {
+    const got=(ev.score!==undefined&&ev.score!=='')?parseFloat(ev.score):null;
+    const pct=got!==null?Math.round((got/ev.maxScore)*100):null;
+    const min=disc?.minScore||60;
+    const sc=pct===null?'var(--text3)':pct>=min?'var(--green)':'var(--orange)';
+    const bc=pct===null?'#d1d5db':pct>=min?'#16a34a':'#ea580c';
+    scoreHtml=`
+      <div class="score-box">
+        <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Pontuação</div>
+        <div style="margin-bottom:8px">
+          <span style="font-size:28px;font-weight:700;color:${sc}">${got!==null?got:'—'}</span>
+          <span style="font-size:14px;color:var(--text3)"> / ${ev.maxScore}</span>
+          ${pct!==null?`<span style="font-size:13px;font-weight:600;color:${sc};margin-left:8px">${pct}%</span>`:''}
+        </div>
+        <div class="pbar"><div class="pbar-fill" style="width:${pct||0}%;background:${bc}"></div></div>
+        ${pct!==null?`<div style="font-size:10px;color:var(--text3);margin-top:4px">Mínimo exigido: ${min}%</div>`:''}
+      </div>`;
+  }
+
+  document.getElementById('detContent').innerHTML=`
+    <div style="margin-bottom:12px">
+      <div style="font-size:15px;font-weight:600;line-height:1.35;margin-bottom:8px">${ev.title}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px">
+        <span class="badge ${BC[status]}">${SL[status]}</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:3px 8px;border-radius:5px;background:${tc}18;color:${tc}">${TYPE_ICONS[ev.type]||''}${TYPE_LABELS[ev.type]}</span>
+        ${disc?`<span style="font-size:11px;padding:3px 8px;border-radius:5px;background:${disc.color}15;color:${disc.color};font-weight:500">${disc.name}</span>`:''}
+      </div>
+    </div>
+    <div class="det-info-grid">
+      <div class="det-row"><span class="det-label">Data</span><span class="det-val">${pd(ev.date).toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})}</span></div>
+      ${ev.startTime?`<div class="det-row"><span class="det-label">Horário</span><span class="det-val">${ev.startTime} – ${ev.endTime||'?'}</span></div>`:''}
+      ${ev.location?`<div class="det-row"><span class="det-label">Local</span><span class="det-val">${ev.location}</span></div>`:''}
+    </div>
+    ${scoreHtml}
+    ${ev.description?`<div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:12px">${ev.description}</div>`:''}
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center;font-size:12px" onclick="openEditModal(getEv('${ev.id}'))">
+        <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M9.5 2.5l2 2-7 7H2.5v-2l7-7z" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Editar
+      </button>
+      ${status!=='done'?`<button class="btn btn-success" style="flex:1;justify-content:center;font-size:12px" onclick="markDone('${ev.id}')">
+        <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M2 7l4 4 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Concluído
+      </button>`:''}
+    </div>
+  `;
+  document.getElementById('detPanel').classList.add('open');
+}
+
+function getEv(id) { return S.events.find(e=>e.id===id); }
+function closeDetail() { document.getElementById('detPanel').classList.remove('open'); }
+function markDone(id) {
+  const ev=S.events.find(e=>e.id===id);
+  if(ev){ ev.status='done'; save(); renderAll(); closeDetail(); toast('Marcado como realizado!','success'); }
+}
+
+// ===== SUMMARY =====
+function renderSummary() {
+  const grid=document.getElementById('sumGrid');
+  grid.innerHTML='';
+  if(!S.disciplines.length){ grid.innerHTML='<div style="color:var(--text3);font-size:13px">Adicione disciplinas para ver o resumo.</div>'; return; }
+
+  S.disciplines.forEach(disc => {
+    const allEvs=S.events.filter(e=>e.disciplineId===disc.id);
+    const evs=allEvs.filter(e=>EVAL_TYPES.includes(e.type));
+    const totalMax=evs.reduce((a,e)=>a+(e.maxScore||0),0);
+    const done=evs.filter(e=>e.score!==undefined&&e.score!=='');
+    const totalGot=done.reduce((a,e)=>a+(parseFloat(e.score)||0),0);
+    const pct=totalMax>0?Math.round((totalGot/totalMax)*100):0;
+    const min=disc.minScore||60;
+    const gc='#16a34a', wc='#ea580c', nc='#9ca3af';
+    const barC=totalMax===0?nc:pct>=min?gc:wc;
+    const txtC=totalMax===0?nc:pct>=min?gc:wc;
+
+    const badgeBg={pending:'var(--accent-light)',done:'var(--green-bg)',upcoming:'var(--yellow-bg)',late:'var(--orange-bg)',cancelled:'var(--red-bg)'};
+    const badgeTx={pending:'var(--accent)',done:'var(--green)',upcoming:'var(--yellow)',late:'var(--orange)',cancelled:'var(--red)'};
+
+    const rows=evs.map(ev=>{
+      const s=getStatus(ev); const tc=TYPE_COLORS[ev.type]||'#6b7280';
+      const got=ev.score!==undefined&&ev.score!==''?ev.score:'—';
+      return `<div class="eval-row">
+        <div class="eval-icon" style="color:${tc}">${TYPE_ICONS[ev.type]||''}</div>
+        <div class="eval-info"><div class="eval-name">${ev.title}</div><div class="eval-date">${TYPE_LABELS[ev.type]} · ${pd(ev.date).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})}</div></div>
+        <div class="eval-badge" style="background:${badgeBg[s]};color:${badgeTx[s]}">${got} / ${ev.maxScore||'?'}</div>
+      </div>`;
+    }).join('');
+
+    const card=el('div','sum-card');
+    card.innerHTML=`
+      <div class="sum-top">
+        <div class="sum-name"><div class="sum-dot" style="background:${disc.color}"></div>${disc.name}</div>
+        <div class="sum-score-row">
+          <span style="font-size:11px;color:var(--text3)">${done.length} de ${evs.length} avaliações realizadas</span>
+          <span class="sum-score-big" style="color:${txtC}">${totalMax>0?totalGot.toFixed(1)+' / '+totalMax:'—'}</span>
+        </div>
+        ${totalMax>0?`<div class="pbar"><div class="pbar-fill" style="width:${pct}%;background:${barC}"></div></div><div class="pbar-info"><span>${pct}%</span><span>mín. ${min}%</span></div>`:''}
+      </div>
+      <div>${evs.length?rows:'<div style="padding:12px 16px;font-size:12px;color:var(--text3)">Nenhuma avaliação vinculada.</div>'}${allEvs.filter(e=>!EVAL_TYPES.includes(e.type)).length?`<div style="padding:8px 16px 10px;font-size:11px;color:var(--text3)">${allEvs.filter(e=>!EVAL_TYPES.includes(e.type)).length} outro(s) compromisso(s)</div>`:''}</div>
+    `;
+    grid.appendChild(card);
+  });
+
+  // No-discipline evaluations
+  const free=S.events.filter(e=>!e.disciplineId&&EVAL_TYPES.includes(e.type));
+  if(free.length){
+    const badgeBg={pending:'var(--accent-light)',done:'var(--green-bg)',upcoming:'var(--yellow-bg)',late:'var(--orange-bg)',cancelled:'var(--red-bg)'};
+    const badgeTx={pending:'var(--accent)',done:'var(--green)',upcoming:'var(--yellow)',late:'var(--orange)',cancelled:'var(--red)'};
+    const rows=free.map(ev=>{
+      const s=getStatus(ev); const tc=TYPE_COLORS[ev.type]||'#6b7280';
+      const got=ev.score!==undefined&&ev.score!==''?ev.score:'—';
+      return `<div class="eval-row"><div class="eval-icon" style="color:${tc}">${TYPE_ICONS[ev.type]||''}</div><div class="eval-info"><div class="eval-name">${ev.title}</div><div class="eval-date">${TYPE_LABELS[ev.type]} · ${pd(ev.date).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})}</div></div><div class="eval-badge" style="background:${badgeBg[s]};color:${badgeTx[s]}">${got} / ${ev.maxScore||'?'}</div></div>`;
+    }).join('');
+    const card=el('div','sum-card');
+    card.innerHTML=`<div class="sum-top"><div class="sum-name"><div class="sum-dot" style="background:#9ca3af"></div>Sem disciplina</div></div><div>${rows}</div>`;
+    grid.appendChild(card);
+  }
+}
+
+// ===== MODALS =====
+function openAddModal(dateVal,timeVal) {
+  editEvId=null;
+  document.getElementById('evTitle_h').textContent='Novo Compromisso';
+  document.getElementById('evDelBtn').style.display='none';
+  document.getElementById('evTitle').value='';
+  document.getElementById('evType').value='aula';
+  document.getElementById('evDate').value=dateVal||ds(new Date());
+  document.getElementById('evStart').value=timeVal||'08:00';
+  document.getElementById('evEnd').value=addH(timeVal||'08:00',1);
+  document.getElementById('evStatus').value='pending';
+  document.getElementById('evLoc').value='';
+  document.getElementById('evDesc').value='';
+  document.getElementById('evMax').value='';
+  document.getElementById('evScore').value='';
+  fillDiscs();
+  updateTypeUI();
+  document.getElementById('evModal').classList.add('open');
+}
+
+function openEditModal(ev) {
+  if(!ev) return;
+  editEvId=ev.id;
+  document.getElementById('evTitle_h').textContent='Editar Compromisso';
+  document.getElementById('evDelBtn').style.display='flex';
+  document.getElementById('evTitle').value=ev.title;
+  document.getElementById('evType').value=ev.type;
+  document.getElementById('evDate').value=ev.date;
+  document.getElementById('evStart').value=ev.startTime||'';
+  document.getElementById('evEnd').value=ev.endTime||'';
+  document.getElementById('evStatus').value=ev.status||'pending';
+  document.getElementById('evLoc').value=ev.location||'';
+  document.getElementById('evDesc').value=ev.description||'';
+  document.getElementById('evMax').value=ev.maxScore||'';
+  document.getElementById('evScore').value=ev.score!==undefined?ev.score:'';
+  fillDiscs(ev.disciplineId);
+  updateTypeUI();
+  document.getElementById('evModal').classList.add('open');
+  closeDetail();
+}
+
+function fillDiscs(sel) {
+  const s=document.getElementById('evDisc');
+  s.innerHTML='<option value="">— Nenhuma —</option>';
+  S.disciplines.forEach(d=>{ const o=document.createElement('option'); o.value=d.id; o.textContent=d.name; if(d.id===sel) o.selected=true; s.appendChild(o); });
+}
+
+function updateTypeUI() {
+  document.getElementById('gradeSection').style.display=EVAL_TYPES.includes(document.getElementById('evType').value)?'':'none';
+}
+
+function addH(t,h) { const[hr,m]=t.split(':').map(Number); return `${String(Math.min(23,hr+h)).padStart(2,'0')}:${String(m).padStart(2,'0')}`; }
+
+function saveEvent() {
+  const title=document.getElementById('evTitle').value.trim();
+  const date=document.getElementById('evDate').value;
+  if(!title||!date){ toast('Preencha título e data!','error'); return; }
+  const ev={ id:editEvId||String(Date.now()), title, date,
+    type:document.getElementById('evType').value,
+    startTime:document.getElementById('evStart').value,
+    endTime:document.getElementById('evEnd').value,
+    status:document.getElementById('evStatus').value,
+    disciplineId:document.getElementById('evDisc').value||null,
+    location:document.getElementById('evLoc').value,
+    description:document.getElementById('evDesc').value,
+    maxScore:parseFloat(document.getElementById('evMax').value)||null,
+    score:document.getElementById('evScore').value!==''?parseFloat(document.getElementById('evScore').value):undefined,
+  };
+  if(editEvId){ const i=S.events.findIndex(e=>e.id===editEvId); if(i>=0) S.events[i]=ev; }
+  else S.events.push(ev);
+  save(); closeOverlay('evModal'); renderAll(); toast(editEvId?'Atualizado!':'Adicionado!','success');
+}
+
+function deleteEvent() {
+  if(!editEvId||!confirm('Excluir este compromisso?')) return;
+  S.events=S.events.filter(e=>e.id!==editEvId);
+  save(); closeOverlay('evModal'); renderAll(); toast('Excluído.','success');
+}
+
+function openDiscModal(disc) {
+  editDiscId=disc?disc.id:null;
+  document.getElementById('discName').value=disc?disc.name:'';
+  document.getElementById('discColor').value=disc?disc.color:'#2563eb';
+  document.getElementById('discMin').value=disc?(disc.minScore||60):60;
+  document.getElementById('discDelBtn').style.display=disc?'flex':'none';
+  document.getElementById('discModal').classList.add('open');
+}
+
+function saveDiscipline() {
+  const name=document.getElementById('discName').value.trim();
+  if(!name){ toast('Informe o nome!','error'); return; }
+  const disc={ id:editDiscId||String(Date.now()), name, color:document.getElementById('discColor').value, minScore:parseFloat(document.getElementById('discMin').value)||60 };
+  if(editDiscId){ const i=S.disciplines.findIndex(d=>d.id===editDiscId); if(i>=0) S.disciplines[i]=disc; }
+  else S.disciplines.push(disc);
+  save(); closeOverlay('discModal'); renderAll(); toast('Disciplina salva!','success');
+}
+
+function deleteDiscipline() {
+  if(!editDiscId||!confirm('Excluir disciplina?')) return;
+  S.disciplines=S.disciplines.filter(d=>d.id!==editDiscId);
+  S.events.forEach(e=>{ if(e.disciplineId===editDiscId) e.disciplineId=null; });
+  save(); closeOverlay('discModal'); renderAll(); toast('Excluída.','success');
+}
+
+function closeOverlay(id) { document.getElementById(id).classList.remove('open'); }
+
+// ===== VIEW SWITCH =====
+function switchView(view,btn) {
+  currentView=view;
+  document.querySelectorAll('[data-view]').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll(`[data-view="${view}"]`).forEach(t=>t.classList.add('active'));
+  document.getElementById('calView').classList.toggle('active',view==='calendar');
+  document.getElementById('sumView').classList.toggle('active',view==='summary');
+  if(view==='summary') renderSummary();
+  closeSidebar();
+}
+
+// ===== SIDEBAR MOBILE =====
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sbOverlay').classList.toggle('vis');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sbOverlay').classList.remove('vis');
+}
+
+// ===== EXPORT / IMPORT =====
+function exportData() {
+  const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(b);
+  a.download=`agenda_${ds(new Date())}.json`; a.click();
+  toast('Dados exportados!','success');
+}
+function importData(e) {
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=ev=>{ try{ const d=JSON.parse(ev.target.result); if(d.events&&d.disciplines){ S=d; save(); renderAll(); toast('Dados importados!','success'); } else toast('Arquivo inválido!','error'); } catch{ toast('Erro ao ler arquivo!','error'); } };
+  r.readAsText(f); e.target.value='';
+}
+
+// ===== TOAST =====
+function toast(msg,type='success') {
+  const t=document.createElement('div'); t.className=`toast ${type}`; t.textContent=msg;
+  document.body.appendChild(t); setTimeout(()=>t.remove(),2500);
+}
+
+// ===== NAV =====
+function changeWeek(d) { weekStart.setDate(weekStart.getDate()+d*7); renderCalendar(); }
+function goToToday()    { weekStart=getWS(new Date()); renderCalendar(); }
+function renderAll()    { renderCalendar(); renderSidebar(); if(currentView==='summary') renderSummary(); }
+
+// ===== KEYBOARD =====
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){ closeOverlay('evModal'); closeOverlay('discModal'); closeDetail(); closeSidebar(); }
+  if(e.key==='ArrowLeft' &&!e.target.closest('input,textarea,select')) changeWeek(-1);
+  if(e.key==='ArrowRight'&&!e.target.closest('input,textarea,select')) changeWeek(1);
+});
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); }));
+
+// ===== INIT =====
+load();
+weekStart=getWS(new Date());
+renderAll();
+// Scroll to business hours (~8am)
+setTimeout(()=>{ const s=document.getElementById('calScroll'); if(s) s.scrollTop=8*2*44; },60);
+
+// Refresh every minute for the now-line
+setInterval(()=>{
+  const today=new Date(); today.setHours(0,0,0,0);
+  const we=new Date(weekStart); we.setDate(we.getDate()+6);
+  if(today>=weekStart&&today<=we) renderCalendar();
+},60000);
+</script>
+</body>
+</html>
